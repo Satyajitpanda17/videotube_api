@@ -100,6 +100,7 @@ It follows a **professional-grade file structure** and includes **robust feature
 | coverImage | File   | ❌        | Channel cover image        |
 
 **Success Response (201):**
+
 ```json
 {
   "success": true,
@@ -113,58 +114,65 @@ It follows a **professional-grade file structure** and includes **robust feature
     "coverImage": "http://cloudinary.com/path/to/cover.jpg"
   }
 }
-
+```
+---
 ### 2. Login User
-Endpoint: POST /users/login
+**Endpoint: POST** `/users/login`
 
 Description: Authenticates a user and returns JWT access and refresh tokens in secure, httpOnly cookies.
 
-**Request Body** (application/json):
+**Request Body (application/json):**
+
 ```json
 {
   "email": "user@example.com",
   "password": "password123"
 }
+```
 
 **Success Response (200 OK)**:
+
 ```json
 {
     "success": true,
     "message": "User logged in successfully",
     "data": {
-        "user": { /* User Object */ },
+        "user": {"User Object"},
         "accessToken": "...",
         "refreshToken": "..."
     }
 }
-
+```
+---
 ### 3. Logout User
-Endpoint: POST /users/logout
+**Endpoint: POST** `/users/logout`
 
 Description: Clears the user's refresh token from the database and clears their access/refresh token cookies.
 
-Authentication: Required (Bearer Token)
+**Authentication: Required (Bearer Token)**
 
 Success Response (200 OK):
-
+```json
 {
     "success": true,
     "message": "User logged out successfully"
 }
-
-4. Refresh Access Token
-Endpoint: POST /users/refresh-token
+```
+---
+### 4. Refresh Access Token
+**Endpoint: POST** `/users/refresh-token`
 
 Description: Generates a new access token using a valid refresh token from the request cookies or body.
 
-Request Body (application/json, optional):
-
+**Request Body (application/json, optional):**
+```json
 {
   "refreshToken": "..."
 }
+```
 
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Access Token refreshed",
@@ -173,108 +181,118 @@ Success Response (200 OK):
         "refreshToken": "..."
     }
 }
-
-User Account Management 👤
+```
+---
+## User Account Management 👤
 Endpoints for managing authenticated user data. All routes in this section require authentication.
 
-5. Change Current Password
-Endpoint: POST /users/change-password
+### 5. Change Current Password
+**Endpoint: POST** `/users/change-password`
 
-Authentication: Required (Bearer Token)
+**Authentication: Required (Bearer Token**)
 
-Request Body (application/json):
-
+**Request Body (application/json):**
+```json
 {
   "oldPassword": "currentPassword123",
   "newPassword": "newSecurePassword456"
 }
+```
 
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Password changed successfully"
 }
+```
+---
+### 6. Get Current User Details
+**Endpoint: GET** `/users/current-user`
 
-6. Get Current User Details
-Endpoint: GET /users/current-user
+**Authentication: Required (Bearer Token)**
 
-Authentication: Required (Bearer Token)
-
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Current user fetched successfully",
-    "data": { /* User Object without password/refreshToken */ }
+    "data": { "User Object without password/refreshToken" }
 }
+```
+---
+### 7. Update Account Details
+**Endpoint: PATCH** ``/users/update-account``
 
-7. Update Account Details
-Endpoint: PATCH /users/update-account
+**Authentication: Required (Bearer Token)**
 
-Authentication: Required (Bearer Token)
-
-Request Body (application/json):
-
+**Request Body (application/json):**
+```json
 {
   "fullName": "New Full Name",
   "email": "new.email@example.com"
 }
-
-Success Response (200 OK):
-
+```
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Account details updated successfully",
-    "data": { /* Updated User Object */ }
+    "data": { "Updated User Object" }
 }
+```
+### 8. Update User Avatar
+**Endpoint: PATCH** `/users/avatar`
 
-8. Update User Avatar
-Endpoint: PATCH /users/avatar
+**Authentication: Required (Bearer Token)**
 
-Authentication: Required (Bearer Token)
+**Request Body:**
+| Field      | Type   | Required | Description                |
+|------------|--------|----------|----------------------------|
+| avatar   | File | ✅        | The new avatar image file.      |
 
-Request Body (multipart/form-data):
-
-avatar: (File) The new avatar image file.
-
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Avatar updated successfully",
-    "data": { /* User Object with new avatar URL */ }
+    "data": { "User Object with new avatar URL" }
 }
+```
+---
+### 9. Update User Cover Image
+**Endpoint: PATCH** `/users/cover-image`
 
-9. Update User Cover Image
-Endpoint: PATCH /users/cover-image
+**Authentication: Required (Bearer Token)**
 
-Authentication: Required (Bearer Token)
+**Request Body):**
 
-Request Body (multipart/form-data):
+| Field      | Type   | Required | Description                |
+|------------|--------|----------|----------------------------|
+| coverImage   | File | ✅        | The cover image file.      |
 
-coverImage: (File) The new cover image file.
-
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Cover Image updated successfully",
-    "data": { /* User Object with new cover image URL */ }
+    "data": { "User Object with new cover image URL" }
 }
+```
+---
 
-Channel & History 📺
+## Channel & History 📺
 Endpoints for public channel data and user-specific history.
 
-10. Get User Channel Profile
-Endpoint: GET /users/c/:username
+### 10. Get User Channel Profile
+**Endpoint: GET** `/users/c/:username`
 
 Description: Fetches a user's public channel profile, including subscriber counts.
 
-Authentication: Optional (If authenticated, the isSubscribed field will be accurate for the current user).
+**Authentication: Optional (If authenticated, the isSubscribed field will be accurate for the current user).**
 
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "User channel fetched successfully",
@@ -288,22 +306,23 @@ Success Response (200 OK):
         "coverImage": "http://cloudinary.com/path/to/cover.jpg"
     }
 }
-
-11. Get User Watch History
-Endpoint: GET /users/history
+```
+---
+### 11. Get User Watch History
+**Endpoint: GET** `/users/history`
 
 Description: Retrieves the watch history for the currently authenticated user.
 
-Authentication: Required (Bearer Token)
+**Authentication: Required (Bearer Token)**
 
-Success Response (200 OK):
-
+**Success Response (200 OK):**
+```json
 {
     "success": true,
     "message": "Watch History fetched successfully",
     "data": [
-        { /* Video Object 1 */ },
-        { /* Video Object 2 */ }
+        { "Video Object 1" },
+        { "Video Object 2" }
     ]
 }
-
+```
