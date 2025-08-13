@@ -7,7 +7,8 @@ It follows a **professional-grade file structure** and includes **robust feature
 
 ## ✨ Features
 
-- **User Authentication**  
+- **User Authentication**
+  
   Secure user registration, login, and session management using **JWT (Access & Refresh Tokens)**.
 
 - **Video Management**  
@@ -326,3 +327,209 @@ Description: Retrieves the watch history for the currently authenticated user.
     ]
 }
 ```
+---
+## Video Management
+### Authentication: All routes require a valid JWT Bearer Token.
+
+### 1. Get All Videos
+**GET** : base url/
+
+Description: Retrieves a paginated list of all published videos. Supports searching, sorting, and filtering by user.
+
+Query Parameters:
+
+| Parameter  | Type   | Default | Description                                           |
+| ---------- | ------ | ------- | ----------------------------------------------------- |
+| `page`     | Number | 1       | Page number for pagination.                           |
+| `limit`    | Number | 10      | Number of videos per page.                            |
+| `query`    | String | N/A     | Search term to filter videos by title or description. |
+| `sortBy`   | String | N/A     | Field to sort by: `views`, `createdAt`, `duration`.   |
+| `sortType` | String | N/A     | Sort order: `asc` or `desc`.                          |
+| `userId`   | String | N/A     | Filter videos by a specific user's ID.                |
+
+**Success Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {
+    "docs": [
+      {
+        "_id": "video_id",
+        "title": "Video Title",
+        "description": "Video Description",
+        "duration": 120,
+        "views": 100,
+        "isPublished": true,
+        "owner": {
+          "_id": "user_id",
+          "username": "username",
+          "avatar": {
+            "url": "avatar_url"
+          }
+        },
+        "createdAt": "2025-08-13T12:00:00Z",
+        "updatedAt": "2025-08-13T12:00:00Z"
+      }
+    ],
+    "totalDocs": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "page": 1
+  },
+  "message": "Videos fetched successfully"
+}
+```
+### 2. Publish a Video
+**POST** : base url/
+
+Description: Uploads a new video and its thumbnail to Cloudinary and creates a new video document.
+
+**Request Body (multipart/form-data):**
+
+| Parameter     | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| `videoFile`   | File   | The video file                    |
+| `thumbnail`   | File   | The thumbnail image for the video |
+| `title`       | String | The title of the video            |
+| `description` | String | The description of the video      |
+
+
+**Success Response (201 Created):**
+```json
+{
+  "status": 200,
+  "data": {
+    "_id": "video_id",
+    "title": "Video Title",
+    "description": "Video Description",
+    "duration": 120,
+    "views": 0,
+    "isPublished": false,
+    "owner": "user_id",
+    "createdAt": "2025-08-13T12:00:00Z",
+    "updatedAt": "2025-08-13T12:00:00Z"
+  },
+  "message": "Video uploaded successfully"
+}
+```
+### 3. Get Video by ID
+**Endpoint: GET** /:videoId
+
+Description: Retrieves detailed information for a single video, including owner details, likes, and subscription status. Increments the view count for the video.
+
+**Request Body (multipart/form-data):**
+| Parameter | Type   | Description         |
+| --------- | ------ | ------------------- |
+| `videoId` | String | The ID of the video |
+
+
+**Success Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {
+    "_id": "video_id",
+    "title": "Video Title",
+    "description": "Video Description",
+    "duration": 120,
+    "views": 100,
+    "isPublished": true,
+    "owner": {
+      "_id": "user_id",
+      "username": "username",
+      "avatar": {
+        "url": "avatar_url"
+      },
+      "subscribersCount": 50,
+      "isSubscribed": true
+    },
+    "comments": [
+      {
+        "_id": "comment_id",
+        "text": "Great video!",
+        "user": {
+          "_id": "user_id",
+          "username": "commenter_username"
+        },
+        "createdAt": "2025-08-13T12:00:00Z"
+      }
+    ],
+    "likesCount": 10,
+    "isLiked": true,
+    "createdAt": "2025-08-13T12:00:00Z",
+    "updatedAt": "2025-08-13T12:00:00Z"
+  },
+  "message": "Video details fetched successfully"
+}
+```
+
+### 4. Update Video Details
+**Endpoint: PATCH** /:videoId
+
+Description: Updates the title, description, and/or thumbnail of a video. Only the owner of the video can perform this action.
+
+**Request Body (multipart/form-data):**
+| Parameter     | Type   | Description                           |
+| ------------- | ------ | ------------------------------------- |
+| `title`       | String | The title of the video                |
+| `description` | String | The description of the video          |
+| `thumbnail`   | File   | The new thumbnail image for the video |
+
+**Success Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {
+    "_id": "video_id",
+    "title": "Updated Video Title",
+    "description": "Updated Video Description",
+    "duration": 120,
+    "views": 100,
+    "isPublished": true,
+    "owner": "user_id",
+    "createdAt": "2025-08-13T12:00:00Z",
+    "updatedAt": "2025-08-13T12:00:00Z"
+  },
+  "message": "Video updated successfully"
+}
+```
+### 5. Delete a Video
+**Endpoint: DELETE** /:videoId
+
+Description: Deletes a video, its associated files from Cloudinary, and all related comments and likes. Only the owner of the video can perform this action.
+
+**Path parameters**
+| Parameter | Type   | Description         |
+| --------- | ------ | ------------------- |
+| `videoId` | String | The ID of the video |
+
+**Success Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {},
+  "message": "Video deleted successfully"
+}
+```
+### 6. Toggle Publish Status
+**Endpoint: PATCH** /toggle/publish/:videoId
+
+Description: Toggles the isPublished status of a video, making it public or private. Only the owner can change the status.
+
+**Path parameters**
+| Parameter | Type   | Description         |
+| --------- | ------ | ------------------- |
+| `videoId` | String | The ID of the video |
+
+**Success Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {
+    "isPublished": true
+  },
+  "message": "Video publish status toggled successfully"
+}
+```
+
+
