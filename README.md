@@ -79,7 +79,7 @@ It follows a **professional-grade file structure** and includes **robust feature
     ```bash
     npm run dev
 
-## API Documentation
+# API Documentation
 #### This documentation provides a detailed reference for all the API endpoints available in this project.
 
 ### Base URL: /api/v1
@@ -329,6 +329,7 @@ Description: Retrieves the watch history for the currently authenticated user.
 ```
 ---
 ## Video Management
+**Base url :** /api/v1/videos
 ### Authentication: All routes require a valid JWT Bearer Token.
 
 ### 1. Get All Videos
@@ -531,5 +532,174 @@ Description: Toggles the isPublished status of a video, making it public or priv
   "message": "Video publish status toggled successfully"
 }
 ```
+---
+## Social Management
+## 1. Comments Management
+**Base url :** /api/v1/comments
+### 1. Get All Comments for a Video
+**Endpoint: GET** /:videoId
 
+Description: Fetches a paginated list of all comments for a specific video, including details about the owner and like count.
 
+**Query Parameters:**
+
+page (Number, optional, default: 1): The page number for pagination.
+
+limit (Number, optional, default: 10): The number of comments per page.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Comments fetched successfully",
+    "data": {
+        "docs": [
+            {
+                "content": "This is a great video!",
+                "createdAt": "2023-10-27T10:00:00.000Z",
+                "likesCount": 15,
+                "owner": {
+                    "username": "testuser",
+                    "fullName": "Test User",
+                    "avatar": { "url": "http://cloudinary.com/path/to/avatar.jpg" }
+                },
+                "isLiked": true
+            }
+        ],
+        "totalDocs": 100,
+        "limit": 10,
+        "page": 1
+    }
+}
+```
+### 2. Add a Comment to a Video
+**Endpoint: POST** /:videoId
+
+Description: Adds a new comment to a specified video.
+
+**Request Body (application/json):**
+```json
+{
+  "content": "This was very informative, thank you!"
+}
+```
+**Success Response (201 Created):**
+```json
+{
+    "success": true,
+    "message": "Comment added successfully",
+    "data": {  "Newly Created Comment Object" }
+}
+```
+### 3. Update a Comment
+**Endpoint: PATCH** /c/:commentId
+
+Description: Updates the content of an existing comment. Only the owner of the comment can perform this action.
+
+**Request Body (application/json):**
+```json
+{
+  "content": "I would like to update my previous comment."
+}
+```
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Comment edited successfully",
+    "data": { "Updated Comment Object" }
+}
+```
+### 4. Delete a Comment
+**Endpoint: DELETE** /c/:commentId
+
+Description: Deletes an existing comment and all of its associated likes. Only the owner of the comment can perform this action.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Comment deleted successfully",
+    "data": {
+        "commentId": "60c72b2f9b1d8c001f8e4c9e"
+    }
+}
+```
+## 2. Like Management on comments, videos, tweeets
+This section details the API endpoints for managing "likes" on videos, comments, and tweets.
+
+Base URL: /api/v1/likes
+**Authentication: All routes require a valid JWT Bearer Token.**
+
+### 1. Toggle Like on a Video
+**Endpoint: POST** /toggle/v/:videoId
+
+Description: Toggles (likes or unlikes) a specific video for the authenticated user.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Operation successful",
+    "data": {
+        "isLiked": true
+    }
+}
+```
+### 2. Toggle Like on a Comment
+**Endpoint: POST** /toggle/c/:commentId
+
+Description: Toggles (likes or unlikes) a specific comment for the authenticated user.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Operation successful",
+    "data": {
+        "isLiked": false
+    }
+}
+```
+### 3. Toggle Like on a Tweet
+**Endpoint: POST** /toggle/t/:tweetId
+
+Description: Toggles (likes or unlikes) a specific tweet for the authenticated user.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Operation successful",
+    "data": {
+        "isLiked": true
+    }
+}
+```
+### 4. Get All Liked Videos
+**Endpoint: GET** /videos
+
+Description: Retrieves a list of all videos that the authenticated user has liked.
+
+**Success Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Liked Videos fetched successfully",
+    "data": [
+        {
+            "likedVideo": {
+                "_id": "videoId123",
+                "videoFile": { "url": "..." },
+                "thumbnail": { "url": "..." },
+                "title": "A Great Video",
+                "ownerDetails": {
+                    "username": "testuser",
+                    "fullName": "Test User",
+                    "avatar": { "url": "..." }
+                }
+            }
+        }
+    ]
+}
+```
