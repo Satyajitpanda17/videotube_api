@@ -703,3 +703,124 @@ Description: Retrieves a list of all videos that the authenticated user has like
     ]
 }
 ```
+
+## Subscription Management
+
+Base URL: `/api/v1/subscription`  
+All endpoints require **JWT authentication** via `Authorization: Bearer <token>`.
+
+---
+
+### 1. Toggle Subscription
+
+**Endpoint: POST** /c/:channelId
+
+**Description:**  
+Subscribe or unsubscribe to a channel. If the user is already subscribed, it unsubscribes; otherwise, it subscribes.
+
+**URL Parameters:**  
+| Parameter  | Type   | Required | Description                   |
+|-----------|--------|----------|-------------------------------|
+| channelId | string | Yes      | The ID of the channel to subscribe/unsubscribe |
+
+**Request Headers:**  
+| Header        | Value           |
+|---------------|----------------|
+| Authorization | Bearer `<token>`|
+
+**Success Response**
+1. Subscribed
+   ```json{
+    "status": 200,
+  "data": { "subscriber": true },
+  "message": "Subscribed successfully"
+   }
+   ```
+2. Unsubscribed
+```json{
+    "status": 200,
+  "data": { "subscriber": false },
+  "message": "Unsubscribed successfully"
+   }
+   ```
+---
+### 2. Get Subscribers of a Channel
+
+**Endpoint:GET** /c/:channelId
+Description:
+Fetch the list of subscribers for a given channel. Only the channel owner can access this list.
+
+**URL Parameters:**
+| Parameter |	Type |	Required | Description |
+|-----------|------|-----------|-------------|
+|subscriberId |	string |	Yes	| The ID of the channel owner/user |
+
+**Request Headers:**  
+| Header        | Value           |
+|---------------|----------------|
+| Authorization | Bearer `<token>`|
+
+**Success Response:**
+```json
+{
+  "status": 200,
+  "data": [
+    {
+      "subscriber": {
+        "_id": "userId",
+        "username": "JohnDoe",
+        "fullName": "John Doe",
+        "avatar": { "url": "http://example.com/avatar.jpg" },
+        "subscribedToSubscriber": true,
+        "subscribersCount": 10
+      }
+    }
+  ],
+  "message": "Subscribers fetched successfully"
+}
+```
+---
+### 3. Get Subscribed Channels of a User
+
+**Endpoint:GET** /c/:channelId
+
+**Description:** Fetch all channels a user is subscribed to, along with the latest video from each channel.
+
+**URL Parameters:**
+| Parameter    | Type   | Required | Description                   |
+| ------------ | ------ | -------- | ----------------------------- |
+| subscriberId | string | Yes      | The ID of the subscriber user |
+
+**Request Headers:**
+| Header        | Value            |
+| ------------- | ---------------- |
+| Authorization | Bearer `<token>` |
+
+**Success Response :**
+```json
+{
+  "status": 200,
+  "data": [
+    {
+      "subscribedChannel": {
+        "_id": "channelId",
+        "username": "JaneDoe",
+        "fullName": "Jane Doe",
+        "avatar": { "url": "http://example.com/avatar2.jpg" },
+        "latestVideo": {
+          "_id": "videoId",
+          "videoFile": { "url": "http://example.com/video.mp4" },
+          "thumbnail": { "url": "http://example.com/thumb.jpg" },
+          "owner": "channelId",
+          "title": "My Latest Video",
+          "description": "Video description",
+          "duration": "5:30",
+          "createdAt": "2025-08-18T05:30:00.000Z",
+          "views": 100
+        }
+      }
+    }
+  ],
+  "message": "Subscribed channels fetched successfully"
+}
+```
